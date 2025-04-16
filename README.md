@@ -1,108 +1,103 @@
-
 # SCHdeepinsight
 
-SCHdeepinsight is a Python package designed for processing and annotating single-cell RNA sequencing (scRNA-seq) data, specifically for immune cells. It leverages **DeepInsight** and **Convolutional Neural Networks (CNN)** to develop an **automated** model for annotating immune cells. By conducting an in-depth analysis of the **hierarchical structure** of immune cells, the model achieves highly efficient and accurate cell type annotation for single-cell RNA sequencing (scRNA-seq) data. The model is particularly effective in handling immune cells, demonstrating exceptional accuracy in identifying both common and potential rare cell types.
+SCHdeepinsight is a Python package for hierarchical annotation of immune cells in single-cell RNA sequencing (scRNA-seq) data. By combining **DeepInsight** transformation with a **hierarchical CNN model**, it provides accurate classification of immune cell types with both base-level and detailed subtype identification.
 
 ## Features
 
-- **Preprocessing**: Normalizes and logarithmically transforms scRNA-seq data stored in `.h5ad` files.
-- **Image Transformation**: Converts processed scRNA-seq data into images suitable for deep learning model input.
-- **Cell Type Prediction**: Uses a pre-trained deep learning model to predict cell types, including base and detailed types.
-- **Rare Cell Identification**: Identifies potential rare cell types by analyzing prediction probabilities.
+- **Batch Correction**: Aligns query data with the integrated reference dataset using STACAS integration
+- **Image Transformation**: Converts gene expression matrices to image representations
+- **Hierarchical Classification**: Two-level annotation providing both major cell types and detailed subtypes
+- **Rare Cell Detection**: Identifies potential rare cell populations based on prediction confidence
 
 ## Installation
 
-You can install SCHdeepinsight using `pip`. Note that the package has a dependency on `pyDeepInsight`, which is installed from GitHub.
+Install SCHdeepinsight using pip:
 
 ```bash
-python3 -m pip -q install git+https://github.com/alok-ai-lab/pyDeepInsight.git#egg=pyDeepInsight
+pip install SCHdeepinsight
+```
+
+Additionally, the package requires pyDeepInsight:
+
+```bash
+pip install git+https://github.com/alok-ai-lab/pyDeepInsight.git#egg=pyDeepInsight
 ```
 
 ## R Dependencies
 
-Before running the batch correction process, ensure that the following R packages are installed. Some of these packages need to be installed directly from GitHub. The installation instructions include commands to install both CRAN packages and GitHub packages using the `remotes` package.
+For batch correction functionality, the following R packages are required:
 
 ```r
-# Install the remotes package if not already installed
+# Install required CRAN packages
+install.packages(c("Seurat", "Matrix", "SeuratDisk"))
+
+# Install packages from GitHub
 if (!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes")
 }
 
-# Load the remotes package
-library(remotes)
-
-# Install necessary packages from GitHub
+# Install STACAS
 remotes::install_github("carmonalab/STACAS")
-remotes::install_github("carmonalab/ProjecTILs")
-remotes::install_github("mojaveazure/seurat-disk")
-
-# Install other required packages from CRAN
-install.packages(c("Seurat", "Matrix"))
 ```
-
-### Notes
-
-- Ensure you have an active internet connection to download the packages.
-- If you encounter any installation issues, ensure you have the necessary development tools for your operating system, as some packages may require compilation.
 
 ## Usage
 
-Here's a brief overview of how to use SCHdeepinsight in your workflow:
-
-1. **Preprocess the Data**: Use the `preprocess` method to normalize and log-transform your scRNA-seq data. This step prepares the data for further analysis.
-2. **Batch Correction**: Perform batch correction using the `batch_correction` method if you need to correct for batch effects. This method uses an R script to project the query dataset onto a reference, ensuring that technical differences between batches do not interfere with downstream analysis. If batch correction is not required, you can skip this step.
-3. **Image Transformation**: Convert the processed data into images using the `image_transform` method. This step is crucial for transforming the gene expression data into a format suitable for input into the deep learning model.
-4. **Prediction**: Use the `predict` method to classify cell types. This step includes both base type and detailed subtype classification and identifies potential rare cell types based on probability thresholds.
-
-## Example
-
-Here’s an example of how to use the `Immune` class to preprocess, batch correct, transform images, and predict:
+Here's how to use SCHdeepinsight to analyze your scRNA-seq data:
 
 ```python
-# Import the Immune class
-from immune import Immune
+from SCHdeepinsight import immune
 
-# Set the output prefix path
-output_prefix = "output_directory"
+# Initialize with output directory
+classifier = immune("./output_dir")
 
-# Create an instance of the Immune class
-immune = Immune(output_prefix=output_prefix)
+# Complete pipeline: batch correction, image transformation, and prediction
+results = classifier.run_pipeline(
+    input_file="path/to/query.h5ad",
+    ref_file="path/to/reference.rds", 
+    batch_size=128
+)
 
-# Option 1: Batch correction (Recommended)
-ref_file = "reference.h5ad"  # Path to the reference data file
-batch_corrected_path = immune.batch_correction(input_file="input_query.h5ad", ref_file=ref_file)
-print(f"Batch-corrected file saved at: {batch_corrected_path}")
+# Access prediction results
+print(results.head())
 
-# Option 2: Preprocess the data (Use this if batch correction is not needed)
-# query_path = "input_query.h5ad"  # Path to the input data file
-# preprocessed_path = immune.preprocess(query_path)
-# print(f"Preprocessed file saved at: {preprocessed_path}")
-
-# Image transformation
-# By default, use the batch-corrected path if batch correction was performed
-# If preprocessing was used instead, pass the preprocessed path to image_transform
-image_path = immune.image_transform(query_path=batch_corrected_path)
-print(f"Image data saved at: {image_path}")
-
-# Prediction
-predictions = immune.predict(batch_size=128, rare_base_threshold=60, rare_detailed_threshold=10)
-print("Prediction results:")
-print(predictions)
+# Save results
+results.to_csv("./immune_cell_predictions.csv")
 ```
 
-### Explanation
+### Step-by-Step Approach
 
-1. **Create an Immune Instance**:
-   - Use the `output_prefix` parameter to specify the directory for output files.
+For more fine-grained control, you can run each step separately:
 
-2. **Option 1: Batch Correction (Recommended)**:
-   - Perform batch correction on the input data using the `batch_correction` method. This method corrects the input data based on a reference dataset and saves the corrected data. The batch-corrected file is recommended for further analysis.
+```python
+from SCHdeepinsight import immune
 
-3. **Option 2: Data Preprocessing**:
-   - If batch correction is not needed, you can use the `preprocess` method to normalize and log-transform the input `.h5ad` file. Only use this if batch correction is unnecessary.
+# Initialize
+classifier = immune("./output_dir")
 
-4. **Image Transformation**:
-   - This step converts the batch-corrected data into image format for prediction. By default, it uses the batch-corrected path. If you used preprocessing instead, replace `batch_corrected_path` with `preprocessed_path` in this step.
+# Step 1: Batch correction
+corrected_file = classifier.batch_correction(
+    input_file="path/to/query.h5ad",
+    ref_file="path/to/reference.rds"
+)
 
-5. **Prediction**:
-   - Use the `predict` method to make predictions on the transformed image data, outputting the prediction results, including cell types and potential rare cell markers.
+# Step 2: Transform gene expression to images
+classifier.image_transform(corrected_file)
+
+# Step 3: Predict cell types
+results = classifier.predict(
+    batch_size=128,
+    rare_base_threshold=60,
+    rare_detailed_threshold=10
+)
+```
+
+## Prediction Results
+
+The results DataFrame contains:
+
+- `barcode`: Cell identifiers
+- `predicted_base_type`: Major cell type classification
+- `predicted_detailed_type`: Detailed subtype classification
+- `base_type_probability`: Confidence score for base type prediction
+- `detailed_type_probability`: Confidence score for detailed type prediction
+- `is_potential_rare`: Boolean flag for potential rare cell types

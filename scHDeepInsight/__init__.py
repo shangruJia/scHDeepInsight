@@ -1,3 +1,3 @@
-# scHDeepInsight/__init__.py
+# SCHdeepinsight/__init__.py
 
-from .immune import Immune
+from .immune import immune
