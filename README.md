@@ -11,7 +11,9 @@ scHDeepInsight is a Python package for hierarchical annotation of immune cells i
 
 ## Installation
 
-Install SCHdeepinsight using pip:
+scHDeepInsight is available on [PyPI](https://pypi.org/project/SCHdeepinsight/).
+
+It can be installed with `pip`:
 
 ```bash
 pip install SCHdeepinsight
