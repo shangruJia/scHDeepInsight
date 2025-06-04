@@ -1,6 +1,6 @@
 # scHDeepInsight
 
-scHDeepInsight is a Python package for hierarchical annotation of immune cells in single-cell RNA sequencing (scRNA-seq) data. By combining **DeepInsight** transformation with a **hierarchical CNN model**, it provides accurate classification of immune cell types with both base-level and detailed subtype identification.
+scHDeepInsight is a Python package for hierarchical annotation of immune cells in single-cell RNA sequencing (scRNA-seq) data. By combining **DeepInsight** transformation with a **hierarchical CNN model**, it provides accurate classification of immune cell types with both base-level and detailed subtype identification. The entire annotation pipeline runs on both CPU and GPU. When a GPU is available, it completes in approximately 10 minutes for 45,000 scRNA-seq cells.
 
 ## Features
 
