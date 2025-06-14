@@ -23,7 +23,7 @@ import warnings
 warnings.simplefilter('ignore')
 global batch_size
 batch_size = 256
-os.environ['CUDA_VISIBLE_DEVICES'] = "4,5,6,7"
+os.environ['CUDA_VISIBLE_DEVICES'] = "0,1,2,3"
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 p = pd.read_csv("/home/ubuntu/shangru/files/trainy.csv", index_col=0)
 p["base_type"].value_counts()
