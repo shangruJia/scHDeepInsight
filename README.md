@@ -103,3 +103,7 @@ The results DataFrame contains:
 - `base_type_probability`: Confidence score for base type prediction
 - `detailed_type_probability`: Confidence score for detailed type prediction
 - `is_potential_rare`: Boolean flag for potential rare cell types
+
+## Contact
+
+If you have any questions or issues, please feel free to contact me through: jiashangru@g.ecc.u-tokyo.ac.jp
