@@ -106,6 +106,4 @@ The results DataFrame contains:
 
 ## Contact
 
-If you have any questions or issues, please feel free to contact me:
-
-**Email**: jiashangru@g.ecc.u-tokyo.ac.jp
+If you have any questions or issues, please feel free to contact me through: jiashangru@g.ecc.u-tokyo.ac.jp
